@@ -65,22 +65,24 @@ npm start
 ---
 
 💡 Future Improvements
-✅ Role-based dashboards
 
-📈 Performance graph integration
+- ✅ Role-based dashboards
 
-📅 Calendar for HR events
+- 📈 Performance graph integration
 
-📢 HR to employee announcement system
+- 📅 Calendar for HR events
 
-🔔 Notification system for leaves & messages
+- 📢 HR to employee announcement system
+
+- 🔔 Notification system for leaves & messages
 
 ---
 
 🧑‍💻 Author
-🔧 Built with 💻, ☕ & a lot of late-night hustle by Anurag Chaturvedi
+
+-🔧 Built with 💻, ☕ & a lot of late-night hustle by Anurag Chaturvedi
 
 ---
 
-📜 License
-This project is licensed under the MIT License.
+📜 License :
+ - This project is licensed under the MIT License.
