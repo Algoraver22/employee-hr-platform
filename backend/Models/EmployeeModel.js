@@ -36,7 +36,5 @@ const EmployeeSchema = new Schema({
     }
 });
 
-const EmployeeModel = mongoose.model('employees', EmployeeSchema);
+const EmployeeModel = mongoose.model('for_users', EmployeeSchema); // ✅ UPDATED
 module.exports = EmployeeModel;
-
-
