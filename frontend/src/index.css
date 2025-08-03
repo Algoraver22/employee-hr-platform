@@ -1,0 +1,53 @@
+html,body,#root {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background-color: #3a3a3c; /* ← Add this line */
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Button: Green with white text */
+.btn.btn-primary {
+  background-color: #28a745 !important; /* Bootstrap green */
+  border: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+.btn.btn-primary:hover {
+  background-color: #218838 !important;
+}
+
+.btn.btn-outline-primary{
+  background-color: #f4bd32 !important; /* Bootstrap green */
+  border:chocolate;
+  color:red;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+/* Brighter Title Text */
+
+
+/* Bolder Input Outlines */
+.form-control:focus {
+  border: 2px solid #17a2b8 ; /* Teal outline */
+  box-shadow: none;
+}
+
+/* Optional: Light gray app background */
+body {
+  background-color: #f1f1f1;
+}
+.bg-718b5e {
+ 
+  background-color: #718b5e; /* Custom background color */
+}
+
