@@ -1,29 +1,46 @@
 const BASE_URL = 'https://employee-hr-platform.onrender.com';
 
 export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
+    // Wake up backend first
+    try {
+        await fetch(`${BASE_URL}/`, { method: 'GET' });
+    } catch (e) {}
+    
     const url = `${BASE_URL}/api/employees?search=${search}&page=${page}&limit=${limit}`;
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
     
     try {
-        const result = await fetch(url, options);
+        const result = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!result.ok) {
+            throw new Error(`HTTP ${result.status}`);
+        }
+        
         const response = await result.json();
         return response.data || response;
     } catch (err) {
-        console.error('Error fetching employees:', err);
-        return {
-            employees: [],
-            pagination: {
-                currentPage: 1,
-                pageSize: 5,
-                totalEmployees: 0,
-                totalPages: 0
-            }
-        };
+        // Retry once after 3 seconds
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        try {
+            const result = await fetch(url, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const response = await result.json();
+            return response.data || response;
+        } catch (retryErr) {
+            return {
+                employees: [],
+                pagination: {
+                    currentPage: 1,
+                    pageSize: 5,
+                    totalEmployees: 0,
+                    totalPages: 0
+                }
+            };
+        }
     }
 }
 

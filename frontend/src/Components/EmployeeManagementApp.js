@@ -31,9 +31,24 @@ const EmployeeManagementApp = () => {
         setLoading(true);
         try {
             const data = await GetAllEmployees(search, page, limit);
-            setEmployeesData(data);
+            if (data && data.employees) {
+                setEmployeesData(data);
+                notify(`Loaded ${data.employees.length} employees`, 'success');
+            } else {
+                setEmployeesData({
+                    employees: [],
+                    pagination: {
+                        currentPage: 1,
+                        pageSize: 5,
+                        totalEmployees: 0,
+                        totalPages: 0
+                    }
+                });
+                notify('Backend is starting up, please wait...', 'info');
+            }
         } catch (err) {
             console.error('Fetch error:', err);
+            notify('Loading data, please wait...', 'info');
         } finally {
             setLoading(false);
         }
