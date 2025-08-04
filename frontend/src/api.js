@@ -1,64 +1,39 @@
 const BASE_URL = 'https://employee-hr-platform.onrender.com';
 
-// Robust fetch with backend wake-up and retry
-const robustFetch = async (url, options = {}, maxRetries = 3) => {
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        try {
-            // Wake up backend on first attempt
-            if (attempt === 1) {
-                try {
-                    await fetch(`${BASE_URL}/`, { method: 'GET' });
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-                } catch (e) {}
-            }
-
-            const response = await fetch(url, {
-                ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
-            });
-
-            if (response.ok) {
-                return response;
-            }
-            
-            if (attempt < maxRetries) {
-                await new Promise(resolve => setTimeout(resolve, 3000));
-            }
-        } catch (error) {
-            if (attempt < maxRetries) {
-                await new Promise(resolve => setTimeout(resolve, 3000));
-            } else {
-                throw error;
-            }
-        }
-    }
-    throw new Error('Max retries exceeded');
-};
-
 export const GetAllEmployees = async (search = '', page = 1, limit = 100) => {
+    console.log('🔥 API CALL STARTED - GetAllEmployees');
+    
     try {
-        const url = `${BASE_URL}/api/employees?search=${search}&page=${page}&limit=${limit}`;
+        const url = `${BASE_URL}/api/employees?search=${search}&page=${page}&limit=${limit}&t=${Date.now()}`;
+        console.log('🔥 Calling URL:', url);
+        
         const response = await fetch(url, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
         });
-        const result = await response.json();
         
-        if (result.success && result.data) {
+        console.log('🔥 Response status:', response.status);
+        
+        const result = await response.json();
+        console.log('🔥 Raw result:', result);
+        
+        if (result.success && result.data && result.data.employees) {
+            console.log('🔥 Found employees:', result.data.employees.length);
             return {
-                employees: result.data.employees || [],
+                employees: result.data.employees,
                 pagination: result.data.pagination || {
                     currentPage: 1,
                     pageSize: 100,
-                    totalEmployees: 0,
-                    totalPages: 0
+                    totalEmployees: result.data.employees.length,
+                    totalPages: 1
                 }
             };
         }
         
+        console.log('🔥 No employees found in result');
         return {
             employees: [],
             pagination: {
@@ -69,7 +44,7 @@ export const GetAllEmployees = async (search = '', page = 1, limit = 100) => {
             }
         };
     } catch (error) {
-        console.error('Error fetching employees:', error);
+        console.error('🔥 API ERROR:', error);
         return {
             employees: [],
             pagination: {
@@ -85,7 +60,7 @@ export const GetAllEmployees = async (search = '', page = 1, limit = 100) => {
 export const GetEmployeeDetailsById = async (id) => {
     try {
         const url = `${BASE_URL}/api/employees/${id}`;
-        const response = await robustFetch(url);
+        const response = await fetch(url);
         const data = await response.json();
         return data.data || data;
     } catch (error) {
@@ -97,7 +72,7 @@ export const GetEmployeeDetailsById = async (id) => {
 export const DeleteEmployeeById = async (id) => {
     try {
         const url = `${BASE_URL}/api/employees/${id}`;
-        const response = await robustFetch(url, { method: 'DELETE' });
+        const response = await fetch(url, { method: 'DELETE' });
         const data = await response.json();
         return data;
     } catch (error) {
@@ -107,6 +82,8 @@ export const DeleteEmployeeById = async (id) => {
 };
 
 export const CreateEmployee = async (empObj) => {
+    console.log('🔥 Creating employee:', empObj);
+    
     try {
         const url = `${BASE_URL}/api/employees`;
         const formData = new FormData();
@@ -123,9 +100,10 @@ export const CreateEmployee = async (empObj) => {
         });
         
         const data = await response.json();
+        console.log('🔥 Create response:', data);
         return { success: true, message: 'Employee added successfully!' };
     } catch (error) {
-        console.error('Error creating employee:', error);
+        console.error('🔥 Create error:', error);
         return { success: true, message: 'Employee added successfully!' };
     }
 };
@@ -139,10 +117,9 @@ export const UpdateEmployeeById = async (empObj, id) => {
             formData.append(key, empObj[key]);
         }
         
-        const response = await robustFetch(url, {
+        const response = await fetch(url, {
             method: 'PUT',
-            body: formData,
-            headers: {} // Don't set Content-Type for FormData
+            body: formData
         });
         
         const data = await response.json();

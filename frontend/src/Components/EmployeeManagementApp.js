@@ -26,26 +26,30 @@ const EmployeeManagementApp = () => {
         }
     });
 
-    const fetchEmployees = async (search = '', page = 1, limit = 5) => {
+    const fetchEmployees = async (search = '', page = 1, limit = 100) => {
+        console.log('🚀 fetchEmployees called with:', { search, page, limit });
         setLoading(true);
         try {
             const data = await GetAllEmployees(search, page, limit);
+            console.log('🚀 fetchEmployees received data:', data);
             
             if (data && data.employees && Array.isArray(data.employees)) {
+                console.log('🚀 Setting employees data:', data.employees.length, 'employees');
                 setEmployeesData(data);
             } else {
+                console.log('🚀 No employees found, setting empty data');
                 setEmployeesData({
                     employees: [],
                     pagination: {
                         currentPage: 1,
-                        pageSize: 5,
+                        pageSize: 100,
                         totalEmployees: 0,
                         totalPages: 0
                     }
                 });
             }
         } catch (err) {
-            console.error('Fetch error:', err);
+            console.error('🚀 Fetch error:', err);
         } finally {
             setLoading(false);
         }
