@@ -27,50 +27,13 @@ const EmployeeManagementApp = () => {
         }
     });
 
-    const fetchEmployees = async (search = '', page = 1, limit = 5, forceRefresh = false) => {
+    const fetchEmployees = async (search = '', page = 1, limit = 5) => {
         setLoading(true);
-        
-        // Show loading message for backend wake-up
-        if (!forceRefresh) {
-            notify('Loading employees... Backend may be starting up.', 'info');
-        }
-        
         try {
             const data = await GetAllEmployees(search, page, limit);
-            
-            if (data && data.employees && data.employees.length > 0) {
-                setEmployeesData(data);
-                localStorage.setItem('employeesData', JSON.stringify(data));
-                localStorage.setItem('lastUpdate', Date.now().toString());
-                notify('Employees loaded successfully!', 'success');
-            } else {
-                // Try to load from cache if available
-                const cachedData = localStorage.getItem('employeesData');
-                if (cachedData) {
-                    const parsed = JSON.parse(cachedData);
-                    setEmployeesData(parsed);
-                    notify('Showing cached employee data. Trying to refresh...', 'info');
-                    
-                    // Try to refresh in background
-                    setTimeout(() => {
-                        fetchEmployees(search, page, limit, true);
-                    }, 5000);
-                } else {
-                    setEmployeesData({
-                        employees: [],
-                        pagination: {
-                            currentPage: 1,
-                            pageSize: 5,
-                            totalEmployees: 0,
-                            totalPages: 0
-                        }
-                    });
-                    notify('No employees found. Backend may be starting up. Please try again in a moment.', 'warning');
-                }
-            }
+            setEmployeesData(data);
         } catch (err) {
             console.error('Fetch error:', err);
-            notify('Connection issue. Please try again in a moment.', 'warning');
         } finally {
             setLoading(false);
         }
@@ -91,11 +54,7 @@ const EmployeeManagementApp = () => {
         setPageTransition(true);
         setTimeout(() => {
             setCurrentPage(page);
-            if (page === 'dashboard') {
-                notify('Loading dashboard data...', 'info');
-                fetchEmployees('', 1, 100);
-            } else if (page === 'employees') {
-                notify('Loading employee directory...', 'info');
+            if (page === 'dashboard' || page === 'employees') {
                 fetchEmployees();
             }
             setPageTransition(false);
@@ -112,28 +71,8 @@ const EmployeeManagementApp = () => {
         setShowModal(true);
     };
     
-    // Auto-refresh data every 30 seconds
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (currentPage === 'dashboard' || currentPage === 'employees') {
-                fetchEmployees('', 1, 100, true);
-            }
-        }, 30000);
-        
-        return () => clearInterval(interval);
-    }, [currentPage]);
-    
-    // Listen for storage changes (when other users add employees)
-    useEffect(() => {
-        const handleStorageChange = () => {
-            const lastUpdate = localStorage.getItem('lastUpdate');
-            if (lastUpdate) {
-                fetchEmployees('', 1, 100, true);
-            }
-        };
-        
-        window.addEventListener('storage', handleStorageChange);
-        return () => window.removeEventListener('storage', handleStorageChange);
+        fetchEmployees();
     }, []);
     const renderContent = () => {
         if (pageTransition) {

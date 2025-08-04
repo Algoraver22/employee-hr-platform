@@ -15,18 +15,7 @@ const Dashboard = ({ employeesData }) => {
         }
     }, [employeesData]);
     
-    // Force refresh dashboard data
-    useEffect(() => {
-        const refreshDashboard = () => {
-            if (employeesData?.employees) {
-                calculateStats(employeesData.employees);
-            }
-        };
-        
-        // Listen for custom refresh events
-        window.addEventListener('dashboardRefresh', refreshDashboard);
-        return () => window.removeEventListener('dashboardRefresh', refreshDashboard);
-    }, [employeesData]);
+
 
     const calculateStats = (employees) => {
         const departments = {};
@@ -69,19 +58,7 @@ const Dashboard = ({ employeesData }) => {
         </div>
     );
 
-    // Trigger dashboard refresh
-    const triggerRefresh = async () => {
-        try {
-            // Re-fetch fresh data
-            const { GetAllEmployees } = await import('../api');
-            const freshData = await GetAllEmployees('', 1, 100);
-            if (freshData && freshData.employees) {
-                calculateStats(freshData.employees);
-            }
-        } catch (err) {
-            console.error('Refresh error:', err);
-        }
-    };
+
     
     return (
         <div className="dashboard-container mb-5">
@@ -90,18 +67,7 @@ const Dashboard = ({ employeesData }) => {
                     <i className="bi bi-speedometer2 me-2"></i>
                     Dashboard Overview
                 </h4>
-                <button className="btn btn-outline-light btn-sm" onClick={triggerRefresh}>
-                    <i className="bi bi-arrow-clockwise me-2"></i>
-                    Refresh Data
-                </button>
             </div>
-            
-            {(!employeesData?.employees || employeesData.employees.length === 0) && (
-                <div className="alert alert-info text-center mb-4">
-                    <i className="bi bi-info-circle me-2"></i>
-                    Dashboard data is loading. If this persists, the backend server may be starting up. Please wait a moment and click "Refresh Data".
-                </div>
-            )}
             <div className="row g-4 mb-4">
                 <div className="col-md-3">
                     <div className="stat-card stat-card-1 glass-card p-4">
