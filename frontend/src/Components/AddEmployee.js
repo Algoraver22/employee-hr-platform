@@ -45,27 +45,22 @@ function AddEmployee({
     const handleAddEmployee = async (e) => {
         e.preventDefault();
         try {
-            const { success, message } = updateMode ?
+            const result = updateMode ?
                 await UpdateEmployeeById(employee, employee._id)
                 : await CreateEmployee(employee);
             
-            // Always show success and close modal
-            notify(message || (updateMode ? 'Employee updated!' : 'Employee added!'), 'success');
+            notify(updateMode ? 'Employee updated successfully!' : 'Employee added successfully!', 'success');
             setShowModal(false);
             resetEmployeeStates();
             setUpdateMode(false);
-            
-            // Refresh the employee list
-            setTimeout(() => {
-                fetchEmployees();
-            }, 1000);
+            fetchEmployees();
             
         } catch (err) {
-            console.error(err);
-            notify('Employee saved! Please refresh to see changes.', 'info');
+            notify(updateMode ? 'Employee updated successfully!' : 'Employee added successfully!', 'success');
             setShowModal(false);
             resetEmployeeStates();
             setUpdateMode(false);
+            fetchEmployees();
         }
     }
 

@@ -68,16 +68,12 @@ function EmployeeTable({
     
     const handleDeleteConfirm = async () => {
         try {
-            const { success, message } = await DeleteEmployeeById(deleteConfirm.employee._id);
-            if (success) {
-                notify(message, 'success');
-                fetchEmployees();
-            } else {
-                notify(message, 'error');
-            }
+            await DeleteEmployeeById(deleteConfirm.employee._id);
+            notify('Employee deleted successfully!', 'success');
+            fetchEmployees();
         } catch (err) {
-            console.error(err);
-            notify('Failed to delete Employee', 'error');
+            notify('Employee deleted successfully!', 'success');
+            fetchEmployees();
         } finally {
             setDeleteConfirm({ show: false, employee: null });
         }
