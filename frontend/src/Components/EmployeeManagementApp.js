@@ -74,6 +74,12 @@ const EmployeeManagementApp = () => {
     useEffect(() => {
         fetchEmployees();
     }, []);
+    
+    useEffect(() => {
+        if (currentPage === 'employees' || currentPage === 'dashboard') {
+            fetchEmployees();
+        }
+    }, [currentPage]);
     const renderContent = () => {
         if (pageTransition) {
             return <LoadingSpinner message="Loading page..." />;
@@ -94,20 +100,26 @@ const EmployeeManagementApp = () => {
                                 <i className='bi bi-people-fill me-2'></i>
                                 Employee Directory
                             </h4>
-                            <div className='position-relative' style={{ width: '300px' }}>
-                                <i className='bi bi-search position-absolute' style={{
-                                    left: '15px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    color: '#666'
-                                }}></i>
-                                <input
-                                    onChange={handleSearch}
-                                    type="text"
-                                    placeholder="Search employees..."
-                                    className='form-control search-input ps-5'
-                                    style={{ paddingLeft: '45px' }}
-                                />
+                            <div className='d-flex gap-3 align-items-center'>
+                                <button className='btn btn-outline-light btn-sm' onClick={() => fetchEmployees()}>
+                                    <i className='bi bi-arrow-clockwise me-2'></i>
+                                    Refresh
+                                </button>
+                                <div className='position-relative' style={{ width: '300px' }}>
+                                    <i className='bi bi-search position-absolute' style={{
+                                        left: '15px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        color: '#666'
+                                    }}></i>
+                                    <input
+                                        onChange={handleSearch}
+                                        type="text"
+                                        placeholder="Search employees..."
+                                        className='form-control search-input ps-5'
+                                        style={{ paddingLeft: '45px' }}
+                                    />
+                                </div>
                             </div>
                         </div>
                         

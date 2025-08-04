@@ -50,17 +50,16 @@ function AddEmployee({
                 : await CreateEmployee(employee);
             
             notify(updateMode ? 'Employee updated successfully!' : 'Employee added successfully!', 'success');
-            setShowModal(false);
-            resetEmployeeStates();
-            setUpdateMode(false);
-            fetchEmployees();
             
         } catch (err) {
             notify(updateMode ? 'Employee updated successfully!' : 'Employee added successfully!', 'success');
+        } finally {
             setShowModal(false);
             resetEmployeeStates();
             setUpdateMode(false);
-            fetchEmployees();
+            setTimeout(() => {
+                fetchEmployees();
+            }, 500);
         }
     }
 
