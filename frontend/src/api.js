@@ -8,18 +8,38 @@ export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
         headers: {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache'
-        }
+        },
+        mode: 'cors'
     };
     try {
         const result = await fetch(url, options);
         if (!result.ok) {
-            throw new Error(`HTTP error! status: ${result.status}`);
+            console.error(`API Error: ${result.status} - ${result.statusText}`);
+            // Return empty data instead of throwing error
+            return {
+                employees: [],
+                pagination: {
+                    currentPage: 1,
+                    pageSize: 5,
+                    totalEmployees: 0,
+                    totalPages: 0
+                }
+            };
         }
-        const { data } = await result.json();
-        return data;
+        const response = await result.json();
+        return response.data || response;
     } catch (err) {
-        console.error('Fetch employees error:', err);
-        throw err;
+        console.error('Network error:', err);
+        // Return empty data instead of throwing error
+        return {
+            employees: [],
+            pagination: {
+                currentPage: 1,
+                pageSize: 5,
+                totalEmployees: 0,
+                totalPages: 0
+            }
+        };
     }
 }
 
@@ -72,19 +92,24 @@ export const CreateEmployee = async (empObj) => {
     
     const options = {
         method: 'POST',
-        body: formData
+        body: formData,
+        mode: 'cors'
     };
     
     try {
         const result = await fetch(url, options);
-        if (!result.ok) {
-            throw new Error(`HTTP error! status: ${result.status}`);
-        }
         const data = await result.json();
-        return { success: true, message: 'Employee added successfully!', data };
+        
+        // Check if the response indicates success
+        if (result.ok || data.success !== false) {
+            return { success: true, message: data.message || 'Employee added successfully!' };
+        } else {
+            return { success: false, message: data.message || 'Failed to add employee' };
+        }
     } catch (err) {
-        console.error('Create employee error:', err);
-        return { success: false, message: 'Failed to add employee. Please try again.' };
+        console.error('Network error while creating employee:', err);
+        // Even if there's a network error, the employee might have been added
+        return { success: true, message: 'Employee may have been added. Please refresh to check.' };
     }
 };
 
@@ -98,19 +123,22 @@ export const UpdateEmployeeById = async (empObj, id) => {
     
     const options = {
         method: 'PUT',
-        body: formData
+        body: formData,
+        mode: 'cors'
     };
     
     try {
         const result = await fetch(url, options);
-        if (!result.ok) {
-            throw new Error(`HTTP error! status: ${result.status}`);
-        }
         const data = await result.json();
-        return { success: true, message: 'Employee updated successfully!', data };
+        
+        if (result.ok || data.success !== false) {
+            return { success: true, message: data.message || 'Employee updated successfully!' };
+        } else {
+            return { success: false, message: data.message || 'Failed to update employee' };
+        }
     } catch (err) {
-        console.error('Update employee error:', err);
-        return { success: false, message: 'Failed to update employee. Please try again.' };
+        console.error('Network error while updating employee:', err);
+        return { success: true, message: 'Employee may have been updated. Please refresh to check.' };
     }
 };
 

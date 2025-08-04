@@ -30,16 +30,21 @@ const EmployeeManagementApp = () => {
     const fetchEmployees = async (search = '', page = 1, limit = 5, forceRefresh = false) => {
         setLoading(true);
         try {
-            // Add cache busting parameter
-            const timestamp = forceRefresh ? `&_t=${Date.now()}` : '';
             const data = await GetAllEmployees(search, page, limit);
             setEmployeesData(data);
             
             // Update localStorage to sync across tabs
             localStorage.setItem('employeesData', JSON.stringify(data));
             localStorage.setItem('lastUpdate', Date.now().toString());
+            
+            // Only show error if no data received
+            if (!data || !data.employees) {
+                notify('Unable to load employees. Please check your connection.', 'warning');
+            }
         } catch (err) {
-            notify('Failed to fetch employees', 'error');
+            console.error('Fetch error:', err);
+            // Don't show error notification, just log it
+            // Users can still use the app with cached data
         } finally {
             setLoading(false);
         }

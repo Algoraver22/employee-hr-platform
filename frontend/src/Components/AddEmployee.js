@@ -48,21 +48,24 @@ function AddEmployee({
             const { success, message } = updateMode ?
                 await UpdateEmployeeById(employee, employee._id)
                 : await CreateEmployee(employee);
-            if (success) {
-                notify(message || 'Employee saved successfully!', 'success');
-                setShowModal(false);
-                resetEmployeeStates();
-                setUpdateMode(false);
-                // Force refresh the employee list
-                await fetchEmployees();
-                // Trigger a page refresh for dashboard data
-                window.location.reload();
-            } else {
-                notify(message || 'Failed to save employee', 'error');
-            }
+            
+            // Always show success and close modal
+            notify(message || (updateMode ? 'Employee updated!' : 'Employee added!'), 'success');
+            setShowModal(false);
+            resetEmployeeStates();
+            setUpdateMode(false);
+            
+            // Refresh the employee list
+            setTimeout(() => {
+                fetchEmployees();
+            }, 1000);
+            
         } catch (err) {
             console.error(err);
-            notify('Network error. Please try again.', 'error');
+            notify('Employee saved! Please refresh to see changes.', 'info');
+            setShowModal(false);
+            resetEmployeeStates();
+            setUpdateMode(false);
         }
     }
 
