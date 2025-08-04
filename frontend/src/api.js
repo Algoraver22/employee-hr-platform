@@ -1,7 +1,21 @@
 const BASE_URL = 'https://employee-hr-platform.onrender.com';
 
 
-export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
+// Wake up the backend server
+const wakeUpBackend = async () => {
+    try {
+        await fetch(`${BASE_URL}/`, { method: 'GET', mode: 'cors' });
+    } catch (err) {
+        console.log('Waking up backend...');
+    }
+};
+
+export const GetAllEmployees = async (search = '', page = 1, limit = 5, retryCount = 0) => {
+    // Wake up backend on first call
+    if (retryCount === 0) {
+        wakeUpBackend();
+    }
+    
     const url = `${BASE_URL}/api/employees?search=${search}&page=${page}&limit=${limit}&_t=${Date.now()}`;
     const options = {
         method: 'GET',
@@ -9,13 +23,22 @@ export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-cache'
         },
-        mode: 'cors'
+        mode: 'cors',
+        timeout: 30000 // 30 second timeout
     };
+    
     try {
         const result = await fetch(url, options);
         if (!result.ok) {
             console.error(`API Error: ${result.status} - ${result.statusText}`);
-            // Return empty data instead of throwing error
+            
+            // Retry once if server error (backend might be waking up)
+            if (result.status >= 500 && retryCount < 1) {
+                console.log('Retrying after server error...');
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                return GetAllEmployees(search, page, limit, retryCount + 1);
+            }
+            
             return {
                 employees: [],
                 pagination: {
@@ -26,11 +49,19 @@ export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
                 }
             };
         }
+        
         const response = await result.json();
         return response.data || response;
     } catch (err) {
         console.error('Network error:', err);
-        // Return empty data instead of throwing error
+        
+        // Retry once on network error (backend might be sleeping)
+        if (retryCount < 1) {
+            console.log('Retrying after network error...');
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            return GetAllEmployees(search, page, limit, retryCount + 1);
+        }
+        
         return {
             employees: [],
             pagination: {

@@ -70,8 +70,17 @@ const Dashboard = ({ employeesData }) => {
     );
 
     // Trigger dashboard refresh
-    const triggerRefresh = () => {
-        window.dispatchEvent(new CustomEvent('dashboardRefresh'));
+    const triggerRefresh = async () => {
+        try {
+            // Re-fetch fresh data
+            const { GetAllEmployees } = await import('../api');
+            const freshData = await GetAllEmployees('', 1, 100);
+            if (freshData && freshData.employees) {
+                calculateStats(freshData.employees);
+            }
+        } catch (err) {
+            console.error('Refresh error:', err);
+        }
     };
     
     return (
@@ -86,6 +95,13 @@ const Dashboard = ({ employeesData }) => {
                     Refresh Data
                 </button>
             </div>
+            
+            {(!employeesData?.employees || employeesData.employees.length === 0) && (
+                <div className="alert alert-info text-center mb-4">
+                    <i className="bi bi-info-circle me-2"></i>
+                    Dashboard data is loading. If this persists, the backend server may be starting up. Please wait a moment and click "Refresh Data".
+                </div>
+            )}
             <div className="row g-4 mb-4">
                 <div className="col-md-3">
                     <div className="stat-card stat-card-1 glass-card p-4">

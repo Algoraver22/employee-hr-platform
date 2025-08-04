@@ -29,22 +29,48 @@ const EmployeeManagementApp = () => {
 
     const fetchEmployees = async (search = '', page = 1, limit = 5, forceRefresh = false) => {
         setLoading(true);
+        
+        // Show loading message for backend wake-up
+        if (!forceRefresh) {
+            notify('Loading employees... Backend may be starting up.', 'info');
+        }
+        
         try {
             const data = await GetAllEmployees(search, page, limit);
-            setEmployeesData(data);
             
-            // Update localStorage to sync across tabs
-            localStorage.setItem('employeesData', JSON.stringify(data));
-            localStorage.setItem('lastUpdate', Date.now().toString());
-            
-            // Only show error if no data received
-            if (!data || !data.employees) {
-                notify('Unable to load employees. Please check your connection.', 'warning');
+            if (data && data.employees && data.employees.length > 0) {
+                setEmployeesData(data);
+                localStorage.setItem('employeesData', JSON.stringify(data));
+                localStorage.setItem('lastUpdate', Date.now().toString());
+                notify('Employees loaded successfully!', 'success');
+            } else {
+                // Try to load from cache if available
+                const cachedData = localStorage.getItem('employeesData');
+                if (cachedData) {
+                    const parsed = JSON.parse(cachedData);
+                    setEmployeesData(parsed);
+                    notify('Showing cached employee data. Trying to refresh...', 'info');
+                    
+                    // Try to refresh in background
+                    setTimeout(() => {
+                        fetchEmployees(search, page, limit, true);
+                    }, 5000);
+                } else {
+                    setEmployeesData({
+                        employees: [],
+                        pagination: {
+                            currentPage: 1,
+                            pageSize: 5,
+                            totalEmployees: 0,
+                            totalPages: 0
+                        }
+                    });
+                    notify('No employees found. Backend may be starting up. Please try again in a moment.', 'warning');
+                }
             }
         } catch (err) {
             console.error('Fetch error:', err);
-            // Don't show error notification, just log it
-            // Users can still use the app with cached data
+            notify('Connection issue. Please try again in a moment.', 'warning');
         } finally {
             setLoading(false);
         }
@@ -66,8 +92,10 @@ const EmployeeManagementApp = () => {
         setTimeout(() => {
             setCurrentPage(page);
             if (page === 'dashboard') {
+                notify('Loading dashboard data...', 'info');
                 fetchEmployees('', 1, 100);
             } else if (page === 'employees') {
+                notify('Loading employee directory...', 'info');
                 fetchEmployees();
             }
             setPageTransition(false);
