@@ -8,13 +8,25 @@ const PORT = process.env.PORT || 8080;
 
 require('./Models/db');
 
-// Enable CORS for all origins
+// Enable CORS for all origins - FORCE REDEPLOY
 app.use(cors({
-    origin: '*',
+    origin: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cache-Control'],
     credentials: false
 }));
+
+// Additional CORS headers
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cache-Control');
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+    } else {
+        next();
+    }
+});
 
 app.use(bodyParser.json());
 app.use('/api/employees', EmployeeRoutes);
