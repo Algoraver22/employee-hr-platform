@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import EmployeeTable from './EmployeeTable';
 import AddEmployee from './AddEmployee';
+import Header from './Header';
+import Dashboard from './Dashboard';
+import AdminPanel from './AdminPanel';
+import LoadingSpinner from './LoadingSpinner';
 import { DeleteEmployeeById, GetAllEmployees } from '../api';
 import { ToastContainer } from 'react-toastify';
 import { notify } from '../utils';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
 const EmployeeManagementApp = () => {
     const [showModal, setShowModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState('home');
+    const [loading, setLoading] = useState(false);
+    const [pageTransition, setPageTransition] = useState(false);
     const [employeeObj, setEmployeeObj] = useState(null)
     const [employeesData, setEmployeesData] = useState({
         employees: [],
@@ -20,19 +28,17 @@ const EmployeeManagementApp = () => {
     });
 
     const fetchEmployees = async (search = '', page = 1, limit = 5) => {
-        console.log('Called fetchEmployees')
+        setLoading(true);
         try {
-            const data =
-                await GetAllEmployees(search, page, limit);
-            console.log(data);
+            const data = await GetAllEmployees(search, page, limit);
             setEmployeesData(data);
         } catch (err) {
-            alert('Error', err);
+            notify('Failed to fetch employees', 'error');
+        } finally {
+            setLoading(false);
         }
     }
-    useEffect(() => {
-        fetchEmployees();
-    }, [])
+    // Remove auto-fetch on component mount
 
 
     const handleSearch = (e) => {
@@ -42,50 +48,136 @@ const EmployeeManagementApp = () => {
     const handleUpdateEmployee = async (emp) => {
         setEmployeeObj(emp);
         setShowModal(true);
-    }
-    return (
-        <div className='d-flex flex-column justify-content-center align-items-center w-100 p-3'>
-            <h1 style={{
-    //   backgroundColor: '#fff3f0',             // soft coral background
-      color: '#2ecc71',                       // coral text
-      padding: '1.5rem',
-      borderRadius: '16px',
-      boxShadow: '0 8px 30px rgba(39, 174, 96, 0.45)', // custom shadow
-      fontFamily: "'Poppins', sans-serif",    // elegant modern font
-      fontSize: '3rem',
-      fontWeight: '500',
-    }}>Employee Management App</h1>
-            <div className="w-100 d-flex justify-content-center  mt-5">
-                <div className='w-80 border rounded-4 shadow-lg  p-4  bg-718b5e' style={{ width: '80%' }}>
-                    <div className='d-flex justify-content-between mb-3 bg-718b5e'>
-                        <button className='btn btn-primary'
-                            onClick={() => setShowModal(true)}>Add</button>
-                        <input
-                            onChange={handleSearch}
-                            type="text"
-                            placeholder="Search Employees..."
-                            className='form-control w-50'
-                        />
+    };
+    
+    const handlePageTransition = (page) => {
+        setPageTransition(true);
+        setTimeout(() => {
+            setCurrentPage(page);
+            if (page === 'dashboard') {
+                fetchEmployees('', 1, 100);
+            } else if (page === 'employees') {
+                fetchEmployees();
+            }
+            setPageTransition(false);
+        }, 300);
+    };
+    
+    const handleNavigation = (page) => {
+        if (page !== currentPage) {
+            handlePageTransition(page);
+        }
+    };
+    
+    const handleAddEmployeeFromHeader = () => {
+        setShowModal(true);
+    };
+    const renderContent = () => {
+        if (pageTransition) {
+            return <LoadingSpinner message="Loading page..." />;
+        }
+        
+        switch (currentPage) {
+            case 'dashboard':
+                return (
+                    <div className="page-transition">
+                        {loading ? <LoadingSpinner message="Loading dashboard..." /> : <Dashboard employeesData={employeesData} />}
                     </div>
-                    <EmployeeTable
-                        employees={employeesData.employees}
-                        pagination={employeesData.pagination}
-                        fetchEmployees={fetchEmployees}
-                        handleUpdateEmployee={handleUpdateEmployee}
-                    />
-
-                    <AddEmployee
-                        fetchEmployees={fetchEmployees}
-                        showModal={showModal}
-                        setShowModal={setShowModal}
-                        employeeObj={employeeObj}
-                    />
+                );
+            case 'employees':
+                return (
+                    <div className="page-transition">
+                        <div className='d-flex justify-content-between align-items-center mb-4'>
+                            <h4 className='text-white mb-0'>
+                                <i className='bi bi-people-fill me-2'></i>
+                                Employee Directory
+                            </h4>
+                            <div className='position-relative' style={{ width: '300px' }}>
+                                <i className='bi bi-search position-absolute' style={{
+                                    left: '15px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: '#666'
+                                }}></i>
+                                <input
+                                    onChange={handleSearch}
+                                    type="text"
+                                    placeholder="Search employees..."
+                                    className='form-control search-input ps-5'
+                                    style={{ paddingLeft: '45px' }}
+                                />
+                            </div>
+                        </div>
+                        
+                        {loading ? (
+                            <LoadingSpinner message="Loading employees..." />
+                        ) : (
+                            <EmployeeTable
+                                employees={employeesData.employees}
+                                pagination={employeesData.pagination}
+                                fetchEmployees={fetchEmployees}
+                                handleUpdateEmployee={handleUpdateEmployee}
+                                loading={loading}
+                            />
+                        )}
+                    </div>
+                );
+            case 'admin':
+                return <AdminPanel />;
+            default:
+                return (
+                    <div className='vertical-buttons-container mb-5 page-transition'>
+                        <button className='btn btn-primary big-action-btn dashboard-btn d-flex align-items-center justify-content-center gap-4'
+                            onClick={() => handlePageTransition('dashboard')}>
+                            <i className='bi bi-graph-up fs-2'></i>
+                            Dashboard
+                        </button>
+                        <button className='btn btn-primary big-action-btn employees-btn d-flex align-items-center justify-content-center gap-4'
+                            onClick={() => handlePageTransition('employees')}>
+                            <i className='bi bi-table fs-2'></i>
+                            View Employees
+                        </button>
+                        <button className='btn btn-primary big-action-btn add-btn d-flex align-items-center justify-content-center gap-4'
+                            onClick={() => setShowModal(true)}>
+                            <i className='bi bi-plus-circle fs-2'></i>
+                            Add Employee
+                        </button>
+                    </div>
+                );
+        }
+    };
+    
+    return (
+        <div className='min-vh-100'>
+            <Header onNavigate={handleNavigation} currentPage={currentPage} onAddEmployee={handleAddEmployeeFromHeader} />
+            
+            <div className='d-flex flex-column justify-content-center align-items-center w-100 p-3 fade-in-up'>
+                <h1 className='app-title mb-5' style={{
+                    fontSize: '3.5rem',
+                    fontWeight: '700',
+                    textAlign: 'center',
+                    marginBottom: '2rem'
+                }}>Employee Management System</h1>
+                
+                <div className="w-100 d-flex justify-content-center mt-4">
+                    <div className='glass-card p-4' style={{ width: '95%', maxWidth: '1400px' }}>
+                        {renderContent()}
+                    </div>
                 </div>
+                
+                <ToastContainer
+                    position='top-right'
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    theme='colored'
+                />
             </div>
-            <ToastContainer
-                position='top-right'
-                autoClose={3000}
-                hideProgressBar={false}
+            
+            <AddEmployee
+                fetchEmployees={fetchEmployees}
+                showModal={showModal}
+                setShowModal={setShowModal}
+                employeeObj={employeeObj}
             />
         </div>
     );
