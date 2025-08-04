@@ -49,17 +49,20 @@ function AddEmployee({
                 await UpdateEmployeeById(employee, employee._id)
                 : await CreateEmployee(employee);
             if (success) {
-                notify(message, 'success');
+                notify(message || 'Employee saved successfully!', 'success');
                 setShowModal(false);
                 resetEmployeeStates();
-                fetchEmployees();
                 setUpdateMode(false);
+                // Force refresh the employee list
+                await fetchEmployees();
+                // Trigger a page refresh for dashboard data
+                window.location.reload();
             } else {
-                notify(message, 'error');
+                notify(message || 'Failed to save employee', 'error');
             }
         } catch (err) {
             console.error(err);
-            notify('Failed to create Employee', 'error');
+            notify('Network error. Please try again.', 'error');
         }
     }
 

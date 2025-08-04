@@ -27,11 +27,17 @@ const EmployeeManagementApp = () => {
         }
     });
 
-    const fetchEmployees = async (search = '', page = 1, limit = 5) => {
+    const fetchEmployees = async (search = '', page = 1, limit = 5, forceRefresh = false) => {
         setLoading(true);
         try {
+            // Add cache busting parameter
+            const timestamp = forceRefresh ? `&_t=${Date.now()}` : '';
             const data = await GetAllEmployees(search, page, limit);
             setEmployeesData(data);
+            
+            // Update localStorage to sync across tabs
+            localStorage.setItem('employeesData', JSON.stringify(data));
+            localStorage.setItem('lastUpdate', Date.now().toString());
         } catch (err) {
             notify('Failed to fetch employees', 'error');
         } finally {
@@ -72,6 +78,30 @@ const EmployeeManagementApp = () => {
     const handleAddEmployeeFromHeader = () => {
         setShowModal(true);
     };
+    
+    // Auto-refresh data every 30 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (currentPage === 'dashboard' || currentPage === 'employees') {
+                fetchEmployees('', 1, 100, true);
+            }
+        }, 30000);
+        
+        return () => clearInterval(interval);
+    }, [currentPage]);
+    
+    // Listen for storage changes (when other users add employees)
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            if (lastUpdate) {
+                fetchEmployees('', 1, 100, true);
+            }
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
     const renderContent = () => {
         if (pageTransition) {
             return <LoadingSpinner message="Loading page..." />;

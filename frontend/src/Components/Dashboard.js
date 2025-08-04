@@ -14,6 +14,19 @@ const Dashboard = ({ employeesData }) => {
             calculateStats(employeesData.employees);
         }
     }, [employeesData]);
+    
+    // Force refresh dashboard data
+    useEffect(() => {
+        const refreshDashboard = () => {
+            if (employeesData?.employees) {
+                calculateStats(employeesData.employees);
+            }
+        };
+        
+        // Listen for custom refresh events
+        window.addEventListener('dashboardRefresh', refreshDashboard);
+        return () => window.removeEventListener('dashboardRefresh', refreshDashboard);
+    }, [employeesData]);
 
     const calculateStats = (employees) => {
         const departments = {};
@@ -56,8 +69,23 @@ const Dashboard = ({ employeesData }) => {
         </div>
     );
 
+    // Trigger dashboard refresh
+    const triggerRefresh = () => {
+        window.dispatchEvent(new CustomEvent('dashboardRefresh'));
+    };
+    
     return (
         <div className="dashboard-container mb-5">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="text-white mb-0">
+                    <i className="bi bi-speedometer2 me-2"></i>
+                    Dashboard Overview
+                </h4>
+                <button className="btn btn-outline-light btn-sm" onClick={triggerRefresh}>
+                    <i className="bi bi-arrow-clockwise me-2"></i>
+                    Refresh Data
+                </button>
+            </div>
             <div className="row g-4 mb-4">
                 <div className="col-md-3">
                     <div className="stat-card stat-card-1 glass-card p-4">

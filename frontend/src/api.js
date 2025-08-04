@@ -2,21 +2,24 @@ const BASE_URL = 'https://employee-hr-platform.onrender.com';
 
 
 export const GetAllEmployees = async (search = '', page = 1, limit = 5) => {
-    const url =
-        `${BASE_URL}/api/employees?search=${search}&page=${page}&limit=${limit}`;
+    const url = `${BASE_URL}/api/employees?search=${search}&page=${page}&limit=${limit}&_t=${Date.now()}`;
     const options = {
         method: 'GET',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
         }
     };
     try {
         const result = await fetch(url, options);
+        if (!result.ok) {
+            throw new Error(`HTTP error! status: ${result.status}`);
+        }
         const { data } = await result.json();
-
         return data;
     } catch (err) {
-        return err;
+        console.error('Fetch employees error:', err);
+        throw err;
     }
 }
 
@@ -61,50 +64,53 @@ export const DeleteEmployeeById = async (id) => {
 
 export const CreateEmployee = async (empObj) => {
     const url = `${BASE_URL}/api/employees`;
-    console.log('url ', url);
-    // Create a FormData object
     const formData = new FormData();
 
-    // Append all fields to the FormData object
     for (const key in empObj) {
         formData.append(key, empObj[key]);
     }
-    // FormData handles the headers and content type
+    
     const options = {
         method: 'POST',
         body: formData
     };
+    
     try {
         const result = await fetch(url, options);
+        if (!result.ok) {
+            throw new Error(`HTTP error! status: ${result.status}`);
+        }
         const data = await result.json();
-        return data;
+        return { success: true, message: 'Employee added successfully!', data };
     } catch (err) {
-        return err;
+        console.error('Create employee error:', err);
+        return { success: false, message: 'Failed to add employee. Please try again.' };
     }
 };
 
 export const UpdateEmployeeById = async (empObj, id) => {
     const url = `${BASE_URL}/api/employees/${id}`;
-    console.log('url ', url);
-    // Create a FormData object
     const formData = new FormData();
 
-    // Append all fields to the FormData object
     for (const key in empObj) {
         formData.append(key, empObj[key]);
     }
-    // FormData handles the headers and content type
+    
     const options = {
         method: 'PUT',
         body: formData
     };
+    
     try {
         const result = await fetch(url, options);
+        if (!result.ok) {
+            throw new Error(`HTTP error! status: ${result.status}`);
+        }
         const data = await result.json();
-        console.log('<---update--> ', data);
-        return data;
+        return { success: true, message: 'Employee updated successfully!', data };
     } catch (err) {
-        return err;
+        console.error('Update employee error:', err);
+        return { success: false, message: 'Failed to update employee. Please try again.' };
     }
 };
 
