@@ -10,7 +10,6 @@ import { ToastContainer } from 'react-toastify';
 import { notify } from '../utils';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-
 const EmployeeManagementApp = () => {
     const [showModal, setShowModal] = useState(false);
     const [currentPage, setCurrentPage] = useState('home');
@@ -30,10 +29,12 @@ const EmployeeManagementApp = () => {
     const fetchEmployees = async (search = '', page = 1, limit = 5) => {
         setLoading(true);
         try {
+            notify('Loading employees... Please wait, backend may be starting up.', 'info');
             const data = await GetAllEmployees(search, page, limit);
-            if (data && data.employees) {
+            
+            if (data && data.employees && Array.isArray(data.employees)) {
                 setEmployeesData(data);
-                notify(`Loaded ${data.employees.length} employees`, 'success');
+                notify(`Successfully loaded ${data.employees.length} employees!`, 'success');
             } else {
                 setEmployeesData({
                     employees: [],
@@ -44,17 +45,15 @@ const EmployeeManagementApp = () => {
                         totalPages: 0
                     }
                 });
-                notify('Backend is starting up, please wait...', 'info');
+                notify('No employees found. Try adding some employees first.', 'warning');
             }
         } catch (err) {
             console.error('Fetch error:', err);
-            notify('Loading data, please wait...', 'info');
+            notify('Unable to load employees. Backend may be starting up. Please try again in a moment.', 'error');
         } finally {
             setLoading(false);
         }
     }
-    // Remove auto-fetch on component mount
-
 
     const handleSearch = (e) => {
         fetchEmployees(e.target.value)
@@ -85,16 +84,32 @@ const EmployeeManagementApp = () => {
     const handleAddEmployeeFromHeader = () => {
         setShowModal(true);
     };
-    
+
+    // Initial load
     useEffect(() => {
         fetchEmployees();
     }, []);
     
+    // Refresh when page changes
     useEffect(() => {
         if (currentPage === 'employees' || currentPage === 'dashboard') {
             fetchEmployees();
         }
     }, [currentPage]);
+
+    // Auto-refresh every 30 seconds when on employee/dashboard pages
+    useEffect(() => {
+        let interval;
+        if (currentPage === 'employees' || currentPage === 'dashboard') {
+            interval = setInterval(() => {
+                fetchEmployees('', 1, 100);
+            }, 30000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [currentPage]);
+
     const renderContent = () => {
         if (pageTransition) {
             return <LoadingSpinner message="Loading page..." />;
@@ -104,6 +119,16 @@ const EmployeeManagementApp = () => {
             case 'dashboard':
                 return (
                     <div className="page-transition">
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h4 className="text-white mb-0">
+                                <i className="bi bi-speedometer2 me-2"></i>
+                                Dashboard Overview
+                            </h4>
+                            <button className="btn btn-outline-light btn-sm" onClick={() => fetchEmployees()}>
+                                <i className="bi bi-arrow-clockwise me-2"></i>
+                                Refresh Data
+                            </button>
+                        </div>
                         {loading ? <LoadingSpinner message="Loading dashboard..." /> : <Dashboard employeesData={employeesData} />}
                     </div>
                 );
@@ -113,7 +138,7 @@ const EmployeeManagementApp = () => {
                         <div className='d-flex justify-content-between align-items-center mb-4'>
                             <h4 className='text-white mb-0'>
                                 <i className='bi bi-people-fill me-2'></i>
-                                Employee Directory
+                                Employee Directory ({employeesData.employees.length} employees)
                             </h4>
                             <div className='d-flex gap-3 align-items-center'>
                                 <button className='btn btn-outline-light btn-sm' onClick={() => fetchEmployees()}>
@@ -196,7 +221,7 @@ const EmployeeManagementApp = () => {
                 
                 <ToastContainer
                     position='top-right'
-                    autoClose={3000}
+                    autoClose={4000}
                     hideProgressBar={false}
                     theme='colored'
                 />
@@ -213,4 +238,3 @@ const EmployeeManagementApp = () => {
 };
 
 export default EmployeeManagementApp;
-
