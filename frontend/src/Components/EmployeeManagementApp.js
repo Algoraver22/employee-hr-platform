@@ -29,12 +29,10 @@ const EmployeeManagementApp = () => {
     const fetchEmployees = async (search = '', page = 1, limit = 5) => {
         setLoading(true);
         try {
-            notify('Please wait...', 'info');
             const data = await GetAllEmployees(search, page, limit);
             
             if (data && data.employees && Array.isArray(data.employees)) {
                 setEmployeesData(data);
-                notify(`Loaded ${data.employees.length} employees successfully!`, 'success');
             } else {
                 setEmployeesData({
                     employees: [],
@@ -45,11 +43,9 @@ const EmployeeManagementApp = () => {
                         totalPages: 0
                     }
                 });
-                notify('Please wait...', 'info');
             }
         } catch (err) {
             console.error('Fetch error:', err);
-            notify('Please wait...', 'info');
         } finally {
             setLoading(false);
         }
