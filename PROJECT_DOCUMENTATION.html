@@ -482,22 +482,259 @@
             </div>
 
             <h3>Technical Architecture</h3>
-            <h4>Frontend (React)</h4>
-            <ul>
-                <li><strong>Components</strong>: Reusable UI elements (Header, Forms, Buttons)</li>
-                <li><strong>Pages</strong>: Full-screen views (Dashboard, Employee Directory, Admin Panel)</li>
-                <li><strong>State Management</strong>: React hooks for local state management</li>
-                <li><strong>Routing</strong>: Client-side navigation between different views</li>
-                <li><strong>Styling</strong>: Bootstrap with custom CSS for modern design</li>
-            </ul>
+            
+            <div class="tech-card">
+                <h4>🏗️ System Architecture Overview</h4>
+                <p><strong>Three-Tier Architecture</strong>: Our application follows a classic three-tier architecture pattern separating presentation, business logic, and data storage layers.</p>
+                
+                <h5>Architecture Layers:</h5>
+                <ul>
+                    <li><strong>Presentation Layer (Frontend)</strong>: React.js handles user interface and user experience</li>
+                    <li><strong>Business Logic Layer (Backend)</strong>: Node.js/Express.js processes business rules and API logic</li>
+                    <li><strong>Data Layer (Database)</strong>: MongoDB stores and manages persistent data</li>
+                </ul>
+            </div>
 
-            <h4>Backend (Node.js/Express)</h4>
-            <ul>
-                <li><strong>REST API</strong>: RESTful endpoints for employee operations</li>
-                <li><strong>Database</strong>: MongoDB with Mongoose ODM</li>
-                <li><strong>File Upload</strong>: Cloudinary integration for profile images</li>
-                <li><strong>Middleware</strong>: CORS, body parsing, error handling</li>
-            </ul>
+            <div class="tech-card">
+                <h4>🎨 Frontend Architecture (React)</h4>
+                
+                <h5>Component-Based Architecture</h5>
+                <p><strong>Theory</strong>: React follows a component-based architecture where the UI is broken down into independent, reusable pieces called components. Each component manages its own state and lifecycle.</p>
+                
+                <h5>Component Hierarchy:</h5>
+                <pre><code>App.js (Root Component)
+├── Header.js (Navigation & User Interface)
+├── EmployeeManagementApp.js (Main Container)
+    ├── Dashboard.js (Analytics & Statistics)
+    │   ├── StatCard.js (Individual Stat Display)
+    │   └── ChartComponent.js (Data Visualization)
+    ├── EmployeeTable.js (Data Grid)
+    │   ├── TableRow.js (Individual Employee Row)
+    │   └── Pagination.js (Page Navigation)
+    ├── AddEmployee.js (Form Modal)
+    │   ├── FormField.js (Input Components)
+    │   └── FileUpload.js (Image Upload)
+    ├── EmployeeDetails.js (Detail View)
+    ├── AdminPanel.js (Admin Tools)
+    └── LoadingSpinner.js (Loading States)</code></pre>
+                
+                <h5>State Management Strategy</h5>
+                <ul>
+                    <li><strong>Local State (useState)</strong>: Component-specific data like form inputs, loading states</li>
+                    <li><strong>Lifted State</strong>: Shared data moved to common parent components</li>
+                    <li><strong>Props Drilling</strong>: Data passed down through component hierarchy</li>
+                    <li><strong>Context API (Future)</strong>: Global state for theme, user preferences</li>
+                </ul>
+                
+                <h5>Virtual DOM & Reconciliation</h5>
+                <p><strong>Theory</strong>: React maintains a virtual representation of the DOM in memory. When state changes, React compares (diffs) the new virtual DOM with the previous version and updates only the changed elements in the real DOM.</p>
+                
+                <h5>Lifecycle & Hooks</h5>
+                <ul>
+                    <li><strong>useEffect</strong>: Side effects like API calls, subscriptions</li>
+                    <li><strong>useState</strong>: Local component state management</li>
+                    <li><strong>useCallback</strong>: Memoized callbacks for performance</li>
+                    <li><strong>useMemo</strong>: Memoized expensive calculations</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>⚙️ Backend Architecture (Node.js/Express)</h4>
+                
+                <h5>RESTful API Design</h5>
+                <p><strong>Theory</strong>: REST (Representational State Transfer) is an architectural style for designing networked applications. It uses standard HTTP methods and follows stateless communication principles.</p>
+                
+                <h5>API Endpoint Structure:</h5>
+                <pre><code>/api/employees
+├── GET    /           (Retrieve all employees)
+├── POST   /           (Create new employee)
+├── GET    /:id        (Retrieve specific employee)
+├── PUT    /:id        (Update employee)
+└── DELETE /:id        (Delete employee)</code></pre>
+                
+                <h5>Middleware Pipeline</h5>
+                <p><strong>Theory</strong>: Express middleware functions execute sequentially during the request-response cycle. Each middleware can modify the request/response objects or terminate the cycle.</p>
+                
+                <h5>Middleware Stack:</h5>
+                <ol>
+                    <li><strong>CORS Middleware</strong>: Handles Cross-Origin Resource Sharing</li>
+                    <li><strong>Body Parser</strong>: Parses incoming JSON and form data</li>
+                    <li><strong>Multer</strong>: Handles multipart/form-data for file uploads</li>
+                    <li><strong>Route Handlers</strong>: Business logic for each endpoint</li>
+                    <li><strong>Error Handler</strong>: Catches and formats errors</li>
+                </ol>
+                
+                <h5>Event-Driven Architecture</h5>
+                <p><strong>Theory</strong>: Node.js uses an event-driven, non-blocking I/O model. Operations like database queries don't block the main thread, allowing the server to handle multiple requests concurrently.</p>
+                
+                <h5>Asynchronous Programming Patterns:</h5>
+                <ul>
+                    <li><strong>Callbacks</strong>: Traditional async pattern (avoided due to callback hell)</li>
+                    <li><strong>Promises</strong>: Better error handling and chaining</li>
+                    <li><strong>Async/Await</strong>: Synchronous-looking asynchronous code</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>🗄️ Database Architecture (MongoDB)</h4>
+                
+                <h5>Document-Oriented Database</h5>
+                <p><strong>Theory</strong>: MongoDB is a NoSQL database that stores data in flexible, JSON-like documents. Unlike relational databases with fixed schemas, MongoDB allows dynamic schemas.</p>
+                
+                <h5>Data Modeling Strategy:</h5>
+                <pre><code>Employee Document Structure:
+{
+  _id: ObjectId("507f1f77bcf86cd799439011"),
+  name: "John Doe",
+  email: "john.doe@company.com",
+  phone: "+1-555-123-4567",
+  department: "Engineering",
+  salary: 75000,
+  profileImage: "https://cloudinary.com/image.jpg",
+  createdAt: ISODate("2024-01-15T10:30:00Z"),
+  updatedAt: ISODate("2024-01-20T14:45:00Z")
+}</code></pre>
+                
+                <h5>Indexing Strategy</h5>
+                <ul>
+                    <li><strong>Primary Index</strong>: Automatic _id index for unique identification</li>
+                    <li><strong>Compound Index</strong>: {name: 1, department: 1} for search optimization</li>
+                    <li><strong>Text Index</strong>: Full-text search on name, email, department fields</li>
+                    <li><strong>Sparse Index</strong>: Optional fields like profileImage</li>
+                </ul>
+                
+                <h5>CRUD Operations & Query Optimization</h5>
+                <ul>
+                    <li><strong>Create</strong>: insertOne() with validation</li>
+                    <li><strong>Read</strong>: find() with pagination and filtering</li>
+                    <li><strong>Update</strong>: findByIdAndUpdate() with atomic operations</li>
+                    <li><strong>Delete</strong>: findByIdAndDelete() with soft delete option</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>🔄 Data Flow Architecture</h4>
+                
+                <h5>Request-Response Cycle</h5>
+                <p><strong>Theory</strong>: The application follows a unidirectional data flow pattern where data moves in a predictable manner from user actions to database operations and back to the UI.</p>
+                
+                <h5>Complete Data Flow:</h5>
+                <pre><code>1. User Interaction (Frontend)
+   ↓
+2. Event Handler (React Component)
+   ↓
+3. API Call (fetch/axios)
+   ↓
+4. HTTP Request (Network Layer)
+   ↓
+5. Express Router (Backend)
+   ↓
+6. Controller Function (Business Logic)
+   ↓
+7. Mongoose Model (Data Access Layer)
+   ↓
+8. MongoDB Query (Database)
+   ↓
+9. Database Response
+   ↓
+10. JSON Response (API)
+    ↓
+11. Frontend State Update
+    ↓
+12. Component Re-render
+    ↓
+13. UI Update (User sees changes)</code></pre>
+                
+                <h5>Error Handling Flow</h5>
+                <ul>
+                    <li><strong>Database Errors</strong>: Mongoose validation, connection errors</li>
+                    <li><strong>API Errors</strong>: HTTP status codes, error messages</li>
+                    <li><strong>Frontend Errors</strong>: Try-catch blocks, error boundaries</li>
+                    <li><strong>User Feedback</strong>: Toast notifications, loading states</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>🔐 Security Architecture</h4>
+                
+                <h5>Defense in Depth Strategy</h5>
+                <p><strong>Theory</strong>: Multiple layers of security controls to protect against various attack vectors.</p>
+                
+                <h5>Security Layers:</h5>
+                <ul>
+                    <li><strong>Transport Security</strong>: HTTPS encryption for data in transit</li>
+                    <li><strong>Input Validation</strong>: Client-side and server-side validation</li>
+                    <li><strong>Data Sanitization</strong>: Prevent injection attacks</li>
+                    <li><strong>CORS Policy</strong>: Controlled cross-origin access</li>
+                    <li><strong>Environment Variables</strong>: Secure credential management</li>
+                    <li><strong>File Upload Security</strong>: Type validation, size limits</li>
+                </ul>
+                
+                <h5>OWASP Top 10 Mitigation:</h5>
+                <ol>
+                    <li><strong>Injection</strong>: Mongoose ODM prevents NoSQL injection</li>
+                    <li><strong>Broken Authentication</strong>: Secure session management</li>
+                    <li><strong>Sensitive Data Exposure</strong>: Environment variable protection</li>
+                    <li><strong>XML External Entities</strong>: JSON-only API</li>
+                    <li><strong>Broken Access Control</strong>: Role-based permissions</li>
+                </ol>
+            </div>
+
+            <div class="tech-card">
+                <h4>📈 Performance Architecture</h4>
+                
+                <h5>Frontend Performance Optimization</h5>
+                <ul>
+                    <li><strong>Code Splitting</strong>: React.lazy() for component-level splitting</li>
+                    <li><strong>Memoization</strong>: React.memo(), useMemo(), useCallback()</li>
+                    <li><strong>Virtual DOM</strong>: Efficient DOM updates through reconciliation</li>
+                    <li><strong>Bundle Optimization</strong>: Webpack tree shaking, minification</li>
+                    <li><strong>Image Optimization</strong>: Cloudinary automatic optimization</li>
+                </ul>
+                
+                <h5>Backend Performance Optimization</h5>
+                <ul>
+                    <li><strong>Database Indexing</strong>: Optimized query performance</li>
+                    <li><strong>Connection Pooling</strong>: Efficient database connections</li>
+                    <li><strong>Caching Strategy</strong>: In-memory caching for frequent queries</li>
+                    <li><strong>Pagination</strong>: Limit data transfer and processing</li>
+                    <li><strong>Compression</strong>: Gzip compression for API responses</li>
+                </ul>
+            </div>
+
+            <div class="tech-card">
+                <h4>🚀 Deployment Architecture</h4>
+                
+                <h5>CI/CD Pipeline</h5>
+                <p><strong>Theory</strong>: Continuous Integration and Continuous Deployment automate the software delivery process from code commit to production deployment.</p>
+                
+                <h5>Deployment Flow:</h5>
+                <pre><code>1. Developer commits code to GitHub
+   ↓
+2. GitHub webhook triggers deployment
+   ↓
+3. Vercel builds React frontend
+   ↓
+4. Render builds Node.js backend
+   ↓
+5. Environment variables injected
+   ↓
+6. Applications deployed to production
+   ↓
+7. Health checks verify deployment
+   ↓
+8. DNS routing updated
+   ↓
+9. Users access updated application</code></pre>
+                
+                <h5>Infrastructure Components:</h5>
+                <ul>
+                    <li><strong>Frontend (Vercel)</strong>: Global CDN, automatic HTTPS, preview deployments</li>
+                    <li><strong>Backend (Render)</strong>: Container deployment, auto-scaling, health monitoring</li>
+                    <li><strong>Database (MongoDB Atlas)</strong>: Managed database, automatic backups, global clusters</li>
+                    <li><strong>File Storage (Cloudinary)</strong>: Image CDN, automatic optimization, transformations</li>
+                </ul>
+            </div>
         </section>
 
         <section id="advanced-concepts">
