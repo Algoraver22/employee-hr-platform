@@ -1,6 +1,7 @@
 
 ### 👩‍💼 Employee HR Platform
-Employee HR Platform streamlines HR tasks by enabling admins to add, update, and manage employee data, including roles, departments, and status. Users can view structured records in real time. Built with the MERN stack, it ensures efficient data handling and a smooth UI.
+
+- Employee HR Platform streamlines HR tasks by enabling admins to add, update, and manage employee data, including roles, departments, and status. Users can view structured records in real time. Built with the MERN stack, it ensures efficient data handling and a smooth UI.
 ---
 
 ### 🌐 Tech Stack (at the very beginning)
