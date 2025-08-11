@@ -1,14 +1,14 @@
-### ------------------------------------
+
 ### Employee HR Platform
-### ------------------------------------
+
 
 **Employee HR Platform** is a modern and responsive HR web application designed to streamline employee data management.  
 It allows administrators to manage employee details, track leaves, post notices, and ensure smooth HR operations.  
 Built with a secure backend and clean design principles, this platform focuses on efficiency and scalability.
+---
 
-### ------------------------------------
 ### 🌐 Tech Stack (at the very beginning)
-### ------------------------------------
+
 - **Backend:** Node.js, Express.js  
 - **Database:** MongoDB (Mongoose ODM)  
 - **Frontend / Styling:** Tailwind CSS  
@@ -16,9 +16,10 @@ Built with a secure backend and clean design principles, this platform focuses o
 - **Security:** JWT Authentication  
 - **Other Tools:** Environment Variables (`.env`), Git
 
-### ------------------------------------
+---
+
 ### 📌 Features
-### ------------------------------------
+
 - **Role-Based Access Control**
   - Admins manage employee data; staff have read-only permissions.
 - **Employee Records Management**
@@ -32,9 +33,9 @@ Built with a secure backend and clean design principles, this platform focuses o
 - **Responsive Design**
   - Mobile-friendly UI with Tailwind CSS.
 
-### ------------------------------------
+ ---
+ 
 ### 🚀 Getting Started
-### ------------------------------------
 
 #### 1. Clone the Repository
 
@@ -54,5 +55,18 @@ PORT=5000
 #### 4. Start the Server
 
 npm start
+
+---
+### 🧑‍💻 Author
+ Crafted with ☕, logic, and code by Anurag Chaturvedi
+
+---
+📜 License
+Licensed under the MIT License.
+
+
+
+
+
 
 
