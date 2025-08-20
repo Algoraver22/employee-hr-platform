@@ -18,7 +18,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/build"
+  ]
 }
