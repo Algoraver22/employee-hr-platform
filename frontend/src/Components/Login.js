@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { notify } from '../utils';
 
 const Login = ({ onLogin }) => {
@@ -8,7 +7,6 @@ const Login = ({ onLogin }) => {
         password: ''
     });
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({
@@ -40,7 +38,6 @@ const Login = ({ onLogin }) => {
                 
                 onLogin(userData);
                 notify('Login successful!', 'success');
-                navigate('/dashboard');
             } else {
                 notify('Please enter valid credentials', 'error');
             }
