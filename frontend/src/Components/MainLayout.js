@@ -8,6 +8,8 @@ import LoadingSpinner from './LoadingSpinner';
 import Departments from './Departments';
 import Reports from './Reports';
 import Settings from './Settings';
+import { DashboardShimmer, EmployeeTableShimmer } from './ShimmerUI';
+import { QuickActionShimmer } from './ButtonShimmer';
 import { GetAllEmployees } from '../api';
 import { ToastContainer } from 'react-toastify';
 import { notify } from '../utils';
@@ -16,6 +18,7 @@ const MainLayout = ({ user, onLogout }) => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [currentPage, setCurrentPage] = useState('dashboard');
     const [loading, setLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [employeeObj, setEmployeeObj] = useState(null);
     const [employeesData, setEmployeesData] = useState({
@@ -31,11 +34,26 @@ const MainLayout = ({ user, onLogout }) => {
     const fetchEmployees = async (search = '', page = 1, limit = 100) => {
         setLoading(true);
         try {
+            // Check cache first for faster loading
+            const cacheKey = `employees_${search}_${page}_${limit}`;
+            const cachedData = sessionStorage.getItem(cacheKey);
+            const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
+            
+            // Use cache if less than 5 minutes old
+            if (cachedData && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
+                setEmployeesData(JSON.parse(cachedData));
+                setLoading(false);
+                return;
+            }
+            
             const data = await GetAllEmployees(search, page, limit);
             if (data && data.employees && Array.isArray(data.employees)) {
                 setEmployeesData(data);
+                // Cache the data
+                sessionStorage.setItem(cacheKey, JSON.stringify(data));
+                sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
             } else {
-                setEmployeesData({
+                const emptyData = {
                     employees: [],
                     pagination: {
                         currentPage: 1,
@@ -43,7 +61,8 @@ const MainLayout = ({ user, onLogout }) => {
                         totalEmployees: 0,
                         totalPages: 0
                     }
-                });
+                };
+                setEmployeesData(emptyData);
             }
         } catch (err) {
             console.error('Fetch error:', err);
@@ -62,12 +81,20 @@ const MainLayout = ({ user, onLogout }) => {
         setShowModal(true);
     };
 
-    const handleNavigation = (page) => {
+    const handleNavigation = async (page) => {
         if (page !== currentPage) {
+            setPageLoading(true);
             setCurrentPage(page);
+            
+            // Simulate loading for data-heavy pages
             if (page === 'dashboard' || page === 'employees') {
-                fetchEmployees();
+                await fetchEmployees();
+            } else {
+                // Add small delay for consistent UX
+                await new Promise(resolve => setTimeout(resolve, 300));
             }
+            
+            setPageLoading(false);
         }
     };
 
@@ -91,17 +118,58 @@ const MainLayout = ({ user, onLogout }) => {
     }, []);
 
     const renderContent = () => {
+        if (pageLoading) {
+            switch (currentPage) {
+                case 'dashboard':
+                    return <DashboardShimmer />;
+                case 'employees':
+                    return (
+                        <div>
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h2 className="page-title">Employee Management</h2>
+                                    <p className="page-subtitle">Manage your organization's workforce</p>
+                                </div>
+                                <button className="btn btn-primary" disabled>
+                                    <i className="bi bi-plus-circle me-2"></i>
+                                    Add Employee
+                                </button>
+                            </div>
+                            <EmployeeTableShimmer />
+                        </div>
+                    );
+                default:
+                    return (
+                        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+                            <div className="spinner"></div>
+                        </div>
+                    );
+            }
+        }
+
         switch (currentPage) {
             case 'dashboard':
                 return loading ? (
-                    <LoadingSpinner message="Loading dashboard..." />
+                    <DashboardShimmer />
                 ) : (
                     <Dashboard employeesData={employeesData} />
                 );
             
             case 'employees':
                 return loading ? (
-                    <LoadingSpinner message="Loading employees..." />
+                    <div>
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h2 className="page-title">Employee Management</h2>
+                                <p className="page-subtitle">Manage your organization's workforce</p>
+                            </div>
+                            <button className="btn btn-primary" disabled>
+                                <i className="bi bi-plus-circle me-2"></i>
+                                Add Employee
+                            </button>
+                        </div>
+                        <EmployeeTableShimmer />
+                    </div>
                 ) : (
                     <div>
                         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -148,6 +216,7 @@ const MainLayout = ({ user, onLogout }) => {
                 currentPage={currentPage}
                 onNavigate={handleNavigation}
                 onToggle={toggleSidebar}
+                pageLoading={pageLoading}
             />
             
             <div className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle }) => {
+const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle, pageLoading }) => {
     const menuItems = [
         { id: 'dashboard', icon: 'bi-speedometer2', label: 'Dashboard' },
         { id: 'employees', icon: 'bi-people-fill', label: 'Employees' },
@@ -22,11 +22,21 @@ const Sidebar = ({ collapsed, currentPage, onNavigate, onToggle }) => {
                 {menuItems.map(item => (
                     <button
                         key={item.id}
-                        className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+                        className={`nav-item ${currentPage === item.id ? 'active' : ''} ${pageLoading ? 'loading' : ''}`}
                         onClick={() => onNavigate(item.id)}
+                        disabled={pageLoading}
                     >
-                        <i className={`bi ${item.icon}`}></i>
-                        {!collapsed && <span>{item.label}</span>}
+                        {pageLoading && currentPage === item.id ? (
+                            <>
+                                <div className="nav-shimmer"></div>
+                                {!collapsed && <div className="nav-text-shimmer"></div>}
+                            </>
+                        ) : (
+                            <>
+                                <i className={`bi ${item.icon}`}></i>
+                                {!collapsed && <span>{item.label}</span>}
+                            </>
+                        )}
                     </button>
                 ))}
             </nav>

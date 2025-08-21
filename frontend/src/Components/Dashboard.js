@@ -10,7 +10,11 @@ const Dashboard = ({ employeesData }) => {
     });
 
     useEffect(() => {
-        if (employeesData?.employees) {
+        // Use cached stats if available for faster loading
+        const cachedStats = sessionStorage.getItem('dashboardStats');
+        if (cachedStats && !employeesData?.employees?.length) {
+            setStats(JSON.parse(cachedStats));
+        } else if (employeesData?.employees) {
             calculateStats(employeesData.employees);
         }
     }, [employeesData]);
@@ -30,13 +34,17 @@ const Dashboard = ({ employeesData }) => {
             if (Math.random() > 0.7) recentHires++;
         });
 
-        setStats({
+        const newStats = {
             totalEmployees: employees.length,
             departments,
             avgSalary: employees.length ? Math.round(totalSalary / employees.length) : 0,
             recentHires,
             activeEmployees
-        });
+        };
+        
+        setStats(newStats);
+        // Cache stats for faster subsequent loads
+        sessionStorage.setItem('dashboardStats', JSON.stringify(newStats));
     };
 
     const StatCard = ({ icon, title, value, iconClass, trend, trendPositive = true }) => (
