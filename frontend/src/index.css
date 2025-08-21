@@ -835,3 +835,32 @@ html,body,#root {
     transform: translateY(0);
   }
 }
+
+/* Error Boundary Styles */
+.error-fallback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 20px;
+}
+
+.error-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-card h2 {
+  color: #ef4444;
+  margin-bottom: 16px;
+}
+
+.error-card p {
+  color: #64748b;
+  margin-bottom: 24px;
+}

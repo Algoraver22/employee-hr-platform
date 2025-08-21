@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Login from './Login';
 import MainLayout from './MainLayout';
+import ErrorBoundary from './ErrorBoundary';
 
 const SimpleApp = () => {
     const [user, setUser] = useState(null);
@@ -42,10 +43,18 @@ const SimpleApp = () => {
     }
 
     if (!user) {
-        return <Login onLogin={handleLogin} />;
+        return (
+            <ErrorBoundary>
+                <Login onLogin={handleLogin} />
+            </ErrorBoundary>
+        );
     }
 
-    return <MainLayout user={user} onLogout={handleLogout} />;
+    return (
+        <ErrorBoundary>
+            <MainLayout user={user} onLogout={handleLogout} />
+        </ErrorBoundary>
+    );
 };
 
 export default SimpleApp;

@@ -11,3 +11,14 @@ window.addEventListener('error', function(e) {
 if (typeof window !== 'undefined') {
   window.bootstrap = undefined;
 }
+
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', function(e) {
+  console.error('Unhandled promise rejection:', e.reason);
+  e.preventDefault();
+});
+
+// Ensure React components render properly
+window.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, initializing app...');
+});
