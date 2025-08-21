@@ -22,3 +22,12 @@ window.addEventListener('unhandledrejection', function(e) {
 window.addEventListener('DOMContentLoaded', function() {
   console.log('DOM loaded, initializing app...');
 });
+
+// Force page reload if app doesn't render within 5 seconds
+setTimeout(function() {
+  const root = document.getElementById('root');
+  if (root && (!root.children.length || root.children[0].children.length === 0)) {
+    console.log('App not rendered, forcing reload...');
+    window.location.reload();
+  }
+}, 5000);

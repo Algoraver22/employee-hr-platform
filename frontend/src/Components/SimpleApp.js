@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Login from './Login';
 import MainLayout from './MainLayout';
 import ErrorBoundary from './ErrorBoundary';
+import LoadingFallback from './LoadingFallback';
 
 const SimpleApp = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [renderKey, setRenderKey] = useState(0);
 
     useEffect(() => {
         // Check if user is already logged in
@@ -26,6 +28,10 @@ const SimpleApp = () => {
 
     const handleLogin = (userData) => {
         setUser(userData);
+        // Force re-render after login
+        setTimeout(() => {
+            setRenderKey(prev => prev + 1);
+        }, 100);
     };
 
     const handleLogout = () => {
@@ -51,8 +57,10 @@ const SimpleApp = () => {
     }
 
     return (
-        <ErrorBoundary>
-            <MainLayout user={user} onLogout={handleLogout} />
+        <ErrorBoundary key={renderKey}>
+            <LoadingFallback>
+                <MainLayout user={user} onLogout={handleLogout} />
+            </LoadingFallback>
         </ErrorBoundary>
     );
 };

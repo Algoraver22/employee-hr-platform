@@ -864,3 +864,42 @@ html,body,#root {
   color: #64748b;
   margin-bottom: 24px;
 }
+
+/* Loading Fallback Styles */
+.loading-fallback {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 20px;
+}
+
+.loading-card {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+}
+
+.loading-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+.loading-card h3 {
+  color: #1e293b;
+  margin-bottom: 12px;
+}
+
+.loading-card p {
+  color: #64748b;
+  margin-bottom: 24px;
+}
