@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import './index.css';
+import './bootstrap-replacement.css';
 import SimpleApp from './Components/SimpleApp';
 import ErrorBoundary from './Components/ErrorBoundary';
 import { ToastContainer } from 'react-toastify';
