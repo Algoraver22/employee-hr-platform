@@ -258,26 +258,6 @@ const Dashboard = (props) => {
         return activities
             .sort((a, b) => b.timestamp - a.timestamp)
             .slice(0, 6);
-        
-        // If no real activities, show system activities
-        if (activities.length === 0) {
-            activities.push(
-                {
-                    icon: 'bi-graph-up',
-                    text: 'Dashboard initialized',
-                    time: 'Just now',
-                    color: '#3b82f6'
-                },
-                {
-                    icon: 'bi-shield-check',
-                    text: 'System security check completed',
-                    time: '1 hour ago',
-                    color: '#10b981'
-                }
-            );
-        }
-        
-        return activities.slice(0, 4);
     }, [employeesData?.employees, activityRefresh]);
 
     const StatCard = ({ icon, title, value, iconClass, trend, trendPositive = true }) => (
@@ -415,13 +395,13 @@ const Dashboard = (props) => {
             </div>
             
             <div className="dashboard-container" style={{ 
-                position: 'fixed',
-                top: showWelcome ? '100vh' : '70px',
-                left: 0,
-                width: '100vw',
-                height: 'calc(100vh - 70px)',
+                position: showWelcome ? 'fixed' : 'relative',
+                top: showWelcome ? '100vh' : '0',
+                left: showWelcome ? 0 : 'auto',
+                width: showWelcome ? '100vw' : '100%',
+                height: showWelcome ? 'calc(100vh - 70px)' : '100%',
                 maxWidth: 'none',
-                zIndex: 9998,
+                zIndex: showWelcome ? 9998 : 'auto',
                 transition: 'top 2s ease-out',
                 overflowY: 'auto',
                 padding: '0 20px',

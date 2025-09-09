@@ -160,6 +160,7 @@ const EmployeeManagementApp = () => {
                         </div>
                         <div style={{ height: '100%', overflowY: 'auto' }}>
                             {loading ? <LoadingSpinner message="Loading dashboard..." /> : <Dashboard 
+                                key="dashboard"
                                 employeesData={employeesData} 
                                 onNavigate={(page) => {
                                     console.log('Dashboard onNavigate called with:', page);
@@ -185,6 +186,7 @@ const EmployeeManagementApp = () => {
                 return (
                     <div style={{ height: '100%', overflow: 'hidden' }}>
                         <ProfessionalEmployeeDirectory
+                            key="employees"
                             employees={employeesData.employees}
                             fetchEmployees={fetchEmployees}
                             handleUpdateEmployee={handleUpdateEmployee}
@@ -195,19 +197,19 @@ const EmployeeManagementApp = () => {
             case 'departments':
                 return (
                     <div style={{ height: '100%', overflow: 'hidden' }}>
-                        <ProfessionalDepartmentDirectory />
+                        <ProfessionalDepartmentDirectory key="departments" />
                     </div>
                 );
             case 'leaves':
                 return (
                     <div style={{ height: '100%', overflow: 'hidden' }}>
-                        <ProfessionalLeaveManagement />
+                        <ProfessionalLeaveManagement key="leaves" />
                     </div>
                 );
             case 'reports':
                 return (
                     <div style={{ height: '100%', overflow: 'hidden' }}>
-                        <Reports />
+                        <Reports key="reports" />
                     </div>
                 );
             default:
